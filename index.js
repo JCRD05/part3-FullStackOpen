@@ -60,11 +60,30 @@ const getRandomId = () => {
 }
 
 app.post('/api/persons', (request, response) => {
-    const body = request.body
-
-    if(!body.name || !body.number) {
+    const body = request.body   
+    
+    if(!body) {
         return response.status(400).json({
             error: 'content missinng'
+        })
+    }
+
+    if(!body.name) {
+        return response.status(400).json({
+            error: 'name missinng'
+        })
+    }
+
+    if(!body.number) {
+        return response.status(400).json({
+            error: 'number missinng'
+        })
+    }
+
+    const isNameRepeated = persons.some(person => person.name === body.name)
+    if(isNameRepeated) {
+        return response.status(400).json({
+            error: 'name must be unique'
         })
     }
 
