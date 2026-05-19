@@ -64,17 +64,8 @@ app.get('/info', (request, response) => {
         </div>`)
 })
 
-const getRandomId = () => {
-    const newId = Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER - 0) + 0)
-    const isRepeated = persons.find(person => person.id === newId)
-
-    if(isRepeated) return getRandomId()
-
-    return newId
-}
-
 app.post('/api/persons', (request, response) => {
-    const body = request.body   
+    const body = request.body
     
     if(!body) {
         return response.status(400).json({
@@ -94,22 +85,12 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    const isNameRepeated = persons.some(person => person.name === body.name)
-    if(isNameRepeated) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-
-    const person = {
-        id: getRandomId(),
+    const newPerson = new Person({
         name: body.name,
         number: body.number
-    }
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    newPerson.save().then(savedPerson => response.json(newPerson))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
