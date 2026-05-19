@@ -36,8 +36,10 @@ let persons = [
     }
 ]
 
-app.get('/api/persons', (request, response) => {
-    Person.find({}).then(persons => response.json(persons))
+app.get('/api/persons', (request, response, next) => {
+    Person.find({})
+        .then(persons => response.json(persons))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -52,13 +54,18 @@ app.get('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
     const currentDate = new Date();
-    response.send(`
-        <div>
-            Phonebook has info for ${Person.length} people
-            <p>${currentDate.toString()}</p>
-        </div>`)
+
+    Person.countDocuments()
+        .then(length => {
+            response.send(`
+            <div>
+                Phonebook has info for ${length} people
+                <p>${currentDate.toString()}</p>
+            </div>`)
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response, next) => {
